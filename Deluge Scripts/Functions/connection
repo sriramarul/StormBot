@@ -1,0 +1,30 @@
+headerForConnection = Map();
+headerForConnection.put("Content-type","application/json");
+response = Map();
+title = arguments;
+/*
+createConnection url is used as an Dummy api call to get the Connection creation dialog box.
+@returns User profile details with status=200.
+*/
+createConnection = invokeurl
+[
+	url :"https://api.stormboard.com/users/profile"
+	type :GET
+	headers:headerForConnection
+	connection:"stormboard3"
+];
+status = createConnection.get("status");
+//Condition to check whether connection created successfully or not.
+if(status == "200")
+{
+	response = {"text":"Please click the  shortcut action *Help* present below which guides you to use Stormboard from cliq.\n---\nHappy Storming!😊","card":{"title":"### Congrats! Connection created.","theme":"modern-inline"}};
+}
+else
+{
+	response = {"text":"Connection Failed! :("};
+}
+values_map = Map();
+values_map.put("stormid",0);
+values_map.put("stormname","Null");
+response_map = zoho.cliq.createRecord("board",values_map);
+return response;

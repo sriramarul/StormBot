@@ -1,0 +1,35 @@
+response = Map();
+header = Map();
+header.put("Content-type","application/json");
+inputs = list();
+/*
+listOfStorms url is used to get the list of storms.
+@returns list of active Storms in your account
+*/
+listOfStorms = invokeurl
+[
+	url :"http://api.stormboard.com/storms"
+	type :GET
+	headers:header
+	connection:"stormboard3"
+];
+stormList = listOfStorms.get("storms").toList();
+// The stormList is checked if there are no active storms present in your Stormboard.
+if(stormList.size() == 0)
+{
+	response = {"text":"Seems like you have not created any storm yet.\n---\nTo create a new Storm enter the following command,\n*/newstorm* [Your Storm Title]","card":{"title":"### No Storm found!😯","theme":"modern-inline"}};
+	return response;
+}
+else
+{
+	storms = List();
+	for each  storm in stormList
+	{
+		stormTitle = storm.get("title");
+		stormid = storm.get("id");
+		storms.add({"label":stormTitle,"value":stormid});
+	}
+	inputs.add({"type":"select","name":"storm","label":"Storm","hint":"Please select your Storm.","mandatory":true,"value":"","placeholder":"Storm","options":storms});
+	form = {"type":"form","title":"Close Storm","hint":"Select the Storm you need to close and then click Close Storm","name":"ID","version":1,"button_label":"Close Storm","actions":{"submit":{"type":"invoke.function","name":"closestorm"}},"inputs":inputs};
+	return form;
+}

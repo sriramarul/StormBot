@@ -1,0 +1,41 @@
+response = Map();
+formValues = form.get("values");
+info form;
+fixedStormId = zoho.cliq.getRecords("board").get("list").toList().get(0).get("stormid").toNumber();
+//Condtion used to check whether any Storm has been fixed by the user.
+if(fixedStormId == 0)
+{
+	stormid = formValues.get("storm").get("value").toNumber();
+	stormname = form.get("values").get("storm").get("label");
+}
+else
+{
+	stormid = fixedStormId;
+	stormname = zoho.cliq.getRecords("board").get("list").toList().get(0).get("stormname");
+}
+idea = formValues.get("idea");
+ParamsCreate = Map();
+ParamsCreate.put("stormid",stormid);
+ParamsCreate.put("data",idea);
+ParamsCreate.put("x",5);
+ParamsCreate.put("y",5);
+/*
+createidea invokeurl has been created to add idea to the selected storm
+@params Stormid,idea to be added
+@returns success response
+*/
+createidea = invokeurl
+[
+	url :"https://api.stormboard.com/ideas"
+	type :POST
+	parameters:ParamsCreate
+	connection:"stormboard3"
+];
+ideaID = createidea.get("id").toText();
+stormID = stormid.toText();
+values1 = Map();
+values1.put("stormID",stormID);
+values1.put("ideaID",ideaID);
+toBot = {"text":"New idea :\"" + idea + "\"\nCreated in the storm :\"" + stormname + "\"","card":{"title":"Idea created","theme":"modern-inline"},"buttons":{{"label":"Assign","hint":stormID,"type":"+","action":{"type":"invoke.function","data":{"name":"Assign"}},"key":ideaID}}};
+zoho.cliq.postToBot("stormbot",toBot);
+return response;

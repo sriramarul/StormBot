@@ -1,0 +1,12 @@
+response = Map();
+userName = user.get("first_name");
+// newuser is a boolean which defines whether the user is a first time subscriber or not!
+if(newuser)
+{
+	response = {"text":"I am here to help you connect with your Stormboard and to generate more ideas, and then assign, update, and refine those ideas to make your meetings, brainstorms, and projects more productive and effective.","card":{"title":"Hey " + userName + " ! 😃","theme":"modern-inline"},"buttons":{{"label":"Get Started","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"getconnection"}},"key":""}}};
+}
+else
+{
+	response = {"text":"If you remeber what I can do then it's cool, else please click the *Help* shortcut action below.\n\nHappy Storming! 😊","card":{"title":"Hey " + userName + ", it's good to have you back!","theme":"modern-inline"}};
+}
+return response;

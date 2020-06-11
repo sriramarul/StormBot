@@ -1,0 +1,41 @@
+response = Map();
+//To check  whether the input is from addidea command or listidea command 
+if(target.get("hint").isNull())
+{
+	ideaID = arguments.get("key").toNumber();
+	ideaDetail = invokeurl
+	[
+		url :"https://api.stormboard.com/ideas/" + ideaID + ""
+		type :GET
+		connection:"stormboard3"
+	];
+	stormID = ideaDetail.get("idea").get("storm").get("id").toNumber();
+}
+else
+{
+	stormID = target.get("hint").toNumber();
+	ideaID = arguments.get("key").toNumber();
+}
+info ideaID;
+//To get the list of Participants
+stormParticipants = invokeurl
+[
+	url :"https://api.stormboard.com/storms/" + stormID + "/users"
+	type :GET
+	connection:"stormboard3"
+];
+numberOfParticipants = stormParticipants.get("users").toList();
+info numberOfParticipants;
+inputs = list();
+storms = List();
+for each  participant in numberOfParticipants
+{
+	userID = participant.get("id");
+	userName = participant.get("username");
+	storms.add({"label":userName,"value":userID});
+}
+inputs.add({"type":"select","name":"storm","label":"Participant","hint":"Please select a participant to whom the task to be assigned						","mandatory":true,"value":"","placeholder":"Storm Participant","options":storms});
+inputs.add({"type":"hidden","name":"ideaID","value":ideaID});
+inputs.add({"hint":"Mention the last date to complete the task","name":"dateinfo","label":"Due date for task","placeholder":"01/01/2019","type":"date","value":"","mandatory":true});
+form = {"type":"form","title":"Assign Task","hint":"Please select a member and enter the due date ","name":"ID","version":1,"button_label":"Assign Task","actions":{"submit":{"type":"invoke.function","name":"AssigningForm"}},"inputs":inputs};
+return form;

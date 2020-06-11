@@ -1,0 +1,18 @@
+response = Map();
+dbId = zoho.cliq.getRecords("board").get("list").toList().get(0).get("id");
+stormId = zoho.cliq.getRecords("board").get("list").toList().get(0).get("stormid").toNumber();
+//Condition to check whether previously storm bot is fixed or not.
+if(stormId == 0)
+{
+	response = {"text":"To unset,you have to set a Storm first.\n---\nUse *SetStorm* shorcut action below(StormBot) to set Storm for a while.","card":{"title":"### No Storm has been set!😯","theme":"modern-inline"}};
+	return response;
+}
+else
+{
+	values_map = Map();
+	values_map.put("stormid",0);
+	values_map.put("stormname","Null");
+	newStorm = zoho.cliq.updateRecord("board",dbId,values_map);
+	response = {"text":"The Storm has been unset successfully","card":{"title":"Action Successful!👍"}};
+	return response;
+}

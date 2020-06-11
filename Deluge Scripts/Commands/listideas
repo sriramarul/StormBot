@@ -1,0 +1,50 @@
+response = Map();
+inputs = list();
+/*
+listOfStorms invokeurl is used to get the available storms in the user's account
+@return list of active storms in the user's account
+*/
+listOfStorms = invokeurl
+[
+	url :"http://api.stormboard.com/storms"
+	type :GET
+	connection:"stormboard3"
+];
+stormList = listOfStorms.get("storms").toList();
+//To check whether the storm list is empty
+if(stormList.size() == 0)
+{
+	response = {"text":"You have to create a Storm first.\n---\nTo create a new Storm enter the following command, \n*/newstorm* [Your Storm Title]\n","card":{"title":"### No Storm Found!😯","theme":"modern-inline"}};
+	return response;
+}
+else
+{
+	storms = List();
+	for each  storm in stormList
+	{
+		stormTitle = storm.get("title");
+		stormid = storm.get("id");
+		storms.add({"label":stormTitle,"value":stormid});
+	}
+	fixedBoard = zoho.cliq.getRecords("board").get("list").toList().get(0).get("stormid").toNumber();
+	//Condition to check whether any storm has been set using "SetStorm" Shortcut action in the Storm bot.
+	if(fixedBoard != 0)
+	{
+		toGetStormName = invokeurl
+		[
+			url :"http://api.stormboard.com/storms/" + fixedBoard
+			type :GET
+			connection:"stormboard3"
+		];
+		stormName = toGetStormName.getJSON("storm").get("title");
+		inputs.add({"type":"select","name":"storm","label":"Storm","hint":"","mandatory":true,"value":fixedBoard,"placeholder":"Storm","options":storms});
+		form = {"type":"form","title":"List Ideas","hint":"Please select your Storm and click List Idea.","name":"ID","version":1,"button_label":"List Idea","actions":{"submit":{"type":"invoke.function","name":"listIdeasFunction"}},"inputs":inputs};
+		return form;
+	}
+	else
+	{
+		inputs.add({"type":"select","name":"storm","label":"Storm","hint":"","mandatory":true,"value":"","placeholder":"Storm","options":storms});
+		form = {"type":"form","title":"List Ideas","hint":"Please select your Storm and click List Idea","name":"ID","version":1,"button_label":"List Idea","actions":{"submit":{"type":"invoke.function","name":"listIdeasFunction"}},"inputs":inputs};
+		return form;
+	}
+}

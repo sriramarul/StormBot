@@ -1,0 +1,5 @@
+//To guide the user with creating a conncection
+response = Map();
+userName = user.get("first_name");
+response = {"text":" \n1)Click the link below to enter into your Stormboard profile.\n *https://www.stormboard.com/users/account *\n2)Select the API tab in your profile and copy the API key provided for your account.\n3)When you click \"Connection\" button below,A pop-up dialog box will appear.\n4)Paste the copied API key.","card":{"title":"### To Create the connection follow the steps below"},"buttons":{{"label":"Connection","type":"+","action":{"type":"invoke.function","data":{"name":"connection"}}}},"slides":{{"type":"images","title":"See how it's done","data":{"","https://media.giphy.com/media/YoiZmWnL7xJ6npIWOH/giphy.gif"}}}};
+return response;

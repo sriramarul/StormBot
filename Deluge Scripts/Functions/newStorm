@@ -1,0 +1,37 @@
+response = Map();
+info form;
+formValues = form.get("values");
+stormTitle = formValues.get("stormtitle");
+headerForCreation = Map();
+headerForCreation.put("Content-Type","application/json");
+paramsCreate = Map();
+paramsCreate.put("plan","personal");
+paramsCreate.put("title",stormTitle);
+/*
+createStorm invokeurl is used to create new storm in the Stormboard
+@params Storm title from the user
+@return success response with Storm joining link
+*/
+createStorm = invokeurl
+[
+	url :"https://api.stormboard.com/storms"
+	type :POST
+	parameters:paramsCreate.toString()
+	headers:headerForCreation
+	connection:"stormboard3"
+];
+//To check whether the Storm is created or not
+if(createStorm.get("status") == 200)
+{
+	joinID = createStorm.get("id");
+	joinKey = createStorm.get("key");
+	response = {"text":"Storm : *" + stormTitle + "*\nCreated by : " + user.get("first_name"),"card":{"title":"### New Storm Created!","thumbnail":"https://imgur.com/wo8WpLn.png","theme":"modern-inline"},"buttons":{{"label":"Join Storm","hint":"","type":"+","action":{"type":"open.url","data":{"web":"https://www.stormboard.com/invite/" + joinID + "/" + joinKey + ""}}}}};
+}
+else
+{
+	card1 = Map();
+	card1.put("theme","modern-inline");
+	response.put("card",card1);
+	response.put("text",createStorm.get("message"));
+}
+return response;

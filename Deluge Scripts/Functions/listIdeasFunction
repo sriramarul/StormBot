@@ -1,0 +1,72 @@
+response = Map();
+stormID = form.get("values").get("storm").get("value").toNumber();
+//To list all the ideas for the given Storm
+listOfIdeas = invokeurl
+[
+	url :"https://api.stormboard.com/storms/" + stormID + "/ideas"
+	type :GET
+	connection:"stormboard3"
+];
+Ideas = listOfIdeas.get("ideas").toList();
+//To check whether any idea exists for the given Storm
+if(!Ideas.size() == 0)
+{
+	stormTitle = listOfIdeas.get("ideas").toList().get(0).get("storm").get("title");
+	rows = List();
+	for each  idea in Ideas
+	{
+		row = Map();
+		//To check whether the idea is an image file or a plain text 
+		if(idea.toMap().get("data").get("name").isNull())
+		{
+			ideaName = idea.get("data").get("text");
+			row.put("Idea",ideaName);
+		}
+		else
+		{
+			ideaName = idea.get("data").get("name");
+			row.put("Idea",ideaName);
+		}
+		//To check whether the idea has been previously assigned to someone
+		if(idea.toMap().get("task").get("assignees").isEmpty())
+		{
+			ideaID = idea.get("id");
+			row.put("Assigned To","[Assign](invoke.function|Assign||" + ideaID + ")");
+		}
+		else
+		{
+			assigne = idea.toMap().get("task").get("assignees").toMap().get("name");
+			row.put("Assigned To",assigne);
+		}
+		//To check whether the Idea has a due date
+		if(!idea.toMap().get("task").get("date").get("due").isNull())
+		{
+			due = idea.toMap().get("task").get("date").get("due");
+			row.put("Due",due);
+		}
+		else
+		{
+			due = "-";
+			row.put("Due",due);
+		}
+		//To check whether the Idea is already completed or not
+		if(!idea.toMap().get("task").get("date").get("completed").isNull())
+		{
+			complete = idea.toMap().get("task").get("date").get("completed");
+			row.put("Completed On",complete);
+		}
+		else
+		{
+			ideaID = idea.get("id");
+			row.put("Completed On"," [Update!](invoke.function|completeTask||" + ideaID + ")");
+		}
+		rows.add(row);
+	}
+	message1 = {"text":"Hey " + user.get("first_name") + " ! :smile: These are the ideas found in your storm : *" + stormTitle + "*.","card":{"theme":"modern-inline","title":"Ideas List:"},"slides":{{"type":"table","title":"","data":{"headers":{"Idea","Assigned To","Due","Completed On"},"rows":rows}}}};
+	return message1;
+}
+else
+{
+	response = {"text":"Looks like you haven't added any idea in the storm. \n---\nTo add an idea use */addidea* command.","card":{"title":"### Oops! No ideas added😕","theme":"modern-inline"}};
+	return response;
+}

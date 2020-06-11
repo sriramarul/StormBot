@@ -1,0 +1,35 @@
+response = Map();
+headerForStormList = Map();
+headerForStormList.put("Content-type","application/json");
+inputs = list();
+/*
+created invoke url is used to get list of storms.
+@returns List of storms
+*/
+listOfStorms = invokeurl
+[
+	url :"http://api.stormboard.com/storms"
+	type :GET
+	headers:headerForStormList
+	connection:"stormboard3"
+];
+stormList = listOfStorms.get("storms").toList();
+//Condition to check whether Storms List is empty.
+if(stormList.size() == 0)
+{
+	response = {"text":"You have to create a Storm first to set.\n---\nTo create a new Storm enter the following command, \n*/newstorm* [Your Storm Title]\n","card":{"title":"### No Storm Found!😯","theme":"modern-inline"}};
+	return response;
+}
+else
+{
+	storms = List();
+	for each  i in stormList
+	{
+		stormTitle = i.get("title");
+		stormId = i.get("id");
+		storms.add({"label":stormTitle,"value":stormId});
+	}
+	inputs.add({"type":"select","name":"storm","label":"Storm","hint":"Please select your storm.","mandatory":true,"value":"","placeholder":"Storm","options":storms});
+	form = {"type":"form","title":"Set Storm","hint":"Select your Storm and click on Set Storm","name":"ID","version":1,"button_label":"Set Storm","actions":{"submit":{"type":"invoke.function","name":"setStorm"}},"inputs":inputs};
+	return form;
+}

@@ -1,0 +1,41 @@
+response = Map();
+ideaID = form.get("values").get("ideaID");
+completeDate = form.get("values").get("dateinfo");
+params = Map();
+params.put("date_completed",completeDate);
+//To update a task as completed using PUT method
+completeTask = invokeurl
+[
+	url :"https://api.stormboard.com/ideas/" + ideaID + "/task"
+	type :PUT
+	parameters:params
+	connection:"stormboard3"
+];
+//Inorder to get idea name we use  GET method 
+ideaDetails = invokeurl
+[
+	url :"http://api.stormboard.com/ideas/" + ideaID
+	type :GET
+	connection:"stormboard3"
+];
+//To check whether the idea contains idea title as "text" or "name"(For text format idea title is "text",for other format idea title is "name")
+if(ideaDetails.get("idea").toMap().get("data").get("name").isNull())
+{
+	ideaName = ideaDetails.get("idea").toMap().get("data").get("text");
+}
+else
+{
+	ideaName = ideaDetails.get("idea").toMap().get("data").get("name");
+}
+//To check whether task have been assigned to any member
+if(ideaDetails.get("idea").get("task").get("assignees").isEmpty())
+{
+	toBot = {"text":"Task has been completed for the \n idea: *" + ideaName + "* \n*Completed Date:* " + completeDate,"card":{"title":"### Task Completed!","theme":"modern-inline"}};
+}
+else
+{
+	assignee = ideaDetails.get("idea").get("task").get("assignees").toMap().get("name");
+	toBot = {"text":"Task has been completed by *" + assignee + "* for the idea: *" + ideaName + "* \n*Completed Date:* " + completeDate,"card":{"title":"### Task Completed!","theme":"modern-inline"}};
+}
+zoho.cliq.postToBot("stormbot",toBot);
+return response;

@@ -1,0 +1,9 @@
+response = Map();
+ideaID = arguments.get("key").toNumber();
+response.put("text","Isn't the instant button super fantabulous? 😲\nFunctions work with buttons. There are two types of buttons - Message Card Buttons and Instant Buttons.");
+//Form to get the completion date from the user.
+inputs = list();
+inputs.add({"type":"hidden","name":"ideaID","value":ideaID});
+inputs.add({"hint":"","name":"dateinfo","label":"Completion date","placeholder":"01/01/2019","type":"date","value":"","mandatory":true});
+form = {"type":"form","title":"Update Task","hint":"Enter the task completion date","name":"ID","version":1,"button_label":"Update Task","actions":{"submit":{"type":"invoke.function","name":"completeForm"}},"inputs":inputs};
+return form;

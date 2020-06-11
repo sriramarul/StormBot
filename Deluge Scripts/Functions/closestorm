@@ -1,0 +1,17 @@
+response = Map();
+stormId = form.get("values").get("storm").get("value").toNumber();
+stormTitle = form.get("values").get("storm").get("label");
+/*
+closeStorm url is used to close the active storms.
+@param stormId 
+@returns success message on closing the storm.
+*/
+closeStorm = invokeurl
+[
+	url :"https://api.stormboard.com/storms/" + stormId + "/close"
+	type :DELETE
+	connection:"stormboard3"
+];
+responseMessage = closeStorm.get("message");
+response = {"text":"Storm: " + stormTitle + ", has been closed.","card":{"title":"### Storm closed 👍","theme":"modern-inline"}};
+return response;

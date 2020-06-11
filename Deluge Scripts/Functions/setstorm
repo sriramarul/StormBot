@@ -1,0 +1,35 @@
+response = Map();
+stormIdFromUser = form.get("values").get("storm").get("value").toNumber();
+stormTitle = form.get("values").get("storm").get("label");
+dbId = zoho.cliq.getRecords("board").get("list").toList().get(0).get("id");
+values_map = Map();
+values_map.put("stormid",stormIdFromUser);
+values_map.put("stormname",stormTitle);
+newStorm = zoho.cliq.updateRecord("board",dbId,values_map);
+//Condition to check whether the selected storm updated to dataBase.
+if(newStorm.get("status").equalsIgnoreCase("SUCCESS"))
+{
+	response.put("text","successful");
+	getTitle = invokeurl
+	[
+		url :"https://api.stormboard.com/storms/" + stormIdFromUser + ""
+		type :GET
+		connection:"stormboard3"
+	];
+	stormTitle = getTitle.get("storm").get("title");
+	card = Map();
+	card.put("title","Storm selected");
+	card.put("theme","modern-inline");
+	response.put("card",card);
+	response.put("text","we won't ask you which storm to add ideas until you unset the selected Storm. We'll just use the storm: *" + stormTitle + "*");
+	return response;
+}
+else
+{
+	card = Map();
+	card.put("title","Storm selected");
+	card.put("theme","modern-inline");
+	response.put("card",card);
+	response.put("text","Failed to set Stormboard ,Check the connection between your Cliq account and Stormboard extension");
+	return response;
+}

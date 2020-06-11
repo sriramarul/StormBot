@@ -1,0 +1,3 @@
+response = Map();
+response = {"text":"\n*SetStorm*\nShortcut action to set a specific storm temporarily.\n\n*UnsetStorm*\nShortcut action to unset the previously selected storm.\n\n*Help* \nGuides you to use Stormboard from Cliq.\n---\n If you haven't installed StormBoard extension [Click here to install](https://cliq.zoho.com/installapp.do?id=2790)","card":{"title":" Here are the things that I can do for you ","theme":"modern-inline"}};
+return response;

@@ -1,0 +1,45 @@
+response = Map();
+info form;
+ideaID = form.get("values").get("ideaID").toNumber();
+userID = form.get("values").get("storm").get("value").toNumber();
+dueDate = form.get("values").get("dateinfo");
+params = Map();
+params.put("assigned_to",userID);
+params.put("date_due",dueDate);
+//invoke url has been used to set a assignee and due date to the task using PUT method.
+assign = invokeurl
+[
+	url :"https://api.stormboard.com/ideas/" + ideaID + "/task"
+	type :PUT
+	parameters:params
+	connection:"stormboard3"
+];
+if(assign.get("status") == 200)
+{
+	ideaDetails = invokeurl
+	[
+		url :"http://api.stormboard.com/ideas/" + ideaID
+		type :GET
+		connection:"stormboard3"
+	];
+	assigneesDetails = ideaDetails.get("idea").get("task").get("assignees").toMap();
+	assignee = assigneesDetails.get("name");
+	dueDate = ideaDetails.get("idea").get("task").get("date").get("due");
+	//To check whether the idea contains idea title as "text" or "name"(For text format idea title is "text",for other format idea title is "name")
+	if(ideaDetails.get("idea").toMap().get("data").get("name").isNull())
+	{
+		ideaName = ideaDetails.get("idea").toMap().get("data").get("text");
+	}
+	else
+	{
+		ideaName = ideaDetails.get("idea").toMap().get("data").get("name");
+	}
+	toBot = {"text":"Task has been assigned to *" + assignee + "* for the *idea:* " + ideaName + " \n*Due Date:* " + dueDate,"card":{"title":"### Task Assigned!","theme":"modern-inline"}};
+	zoho.cliq.postToBot("stormbot",toBot);
+}
+else
+{
+	toBot = {"text":assign.get("message"),"card":{"title":"Assigning process failed! :(","theme":"modern-inline"}};
+	zoho.cliq.postToBot("stormbot",toBot);
+}
+return response;

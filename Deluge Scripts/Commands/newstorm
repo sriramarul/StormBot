@@ -1,0 +1,6 @@
+response = Map();
+stormTitle = arguments;
+inputs = list();
+inputs.add({"type":"text","name":"stormtitle","label":"Storm title","hint":"","placeholder":"Your Storm title.","mandatory":true,"value":stormTitle});
+form = {"type":"form","title":"New Storm","hint":"Please enter your Storm title. ","name":"ID","version":1,"button_label":"Create Storm","actions":{"submit":{"type":"invoke.function","name":"newStorm"}},"inputs":inputs};
+return form;

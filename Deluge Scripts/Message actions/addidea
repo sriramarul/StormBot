@@ -1,0 +1,65 @@
+response = Map();
+ideaContent = message.get("text");
+ideaLength = ideaContent.length();
+inputs = list();
+if(ideaLength >= 100)
+{
+	response.put("text","Idea cannot be created via *Message action* for messages exceeding 100 character limit. Try using our */addidea* command.");
+	card = Map();
+	card.put("theme","modern-inline");
+	response.put("card",card);
+	return response;
+}
+else
+{
+	/*
+listOfStorms invokeurl is used to get the available storms in the user's account
+@return list of active storms in the user's account
+*/
+	listOfStorms = invokeurl
+	[
+		url :"http://api.stormboard.com/storms"
+		type :GET
+		connection:"stormboard3"
+	];
+	stormList = listOfStorms.get("storms").toList();
+	//Error Handled if there is no storm in the user's account
+	if(stormList.size() == 0)
+	{
+		response = {"text":"You have to create a Storm first to add your Idea.\n---\nTo create a new Storm enter the following command, \n*/newstorm* [Your Storm Title]\n","card":{"title":"### No Storm Found!😯","theme":"modern-inline"}};
+		return response;
+	}
+	else
+	{
+		storms = List();
+		for each  storm in stormList
+		{
+			stormTitle = storm.get("title");
+			stormid = storm.get("id");
+			storms.add({"label":stormTitle,"value":stormid});
+		}
+		fixedBoard = zoho.cliq.getRecords("board").get("list").toList().get(0).get("stormid").toNumber();
+		//Condition to check whether any storm has been set using "SetStorm" Shortcut action in the Storm bot.
+		if(fixedBoard != 0)
+		{
+			toGetStormName = invokeurl
+			[
+				url :"http://api.stormboard.com/storms/" + fixedBoard
+				type :GET
+				connection:"stormboard3"
+			];
+			stormName = toGetStormName.getJSON("storm").get("title");
+			response.put("text","success");
+			inputs.add({"type":"text","name":"idea","label":"Idea","hint":"Please enter your idea.","placeholder":"Your Idea.","mandatory":true,"value":ideaContent});
+			form = {"type":"form","title":"Add Idea","hint":"The below idea will be added to the Storm: " + stormName + ".  To select a different Storm Unset the storm first.","name":"ID","version":1,"button_label":"Add Idea","actions":{"submit":{"type":"invoke.function","name":"addidea"}},"inputs":inputs};
+			return form;
+		}
+		else
+		{
+			inputs.add({"type":"select","name":"storm","label":"Storm","hint":"Please select your 								storm.","mandatory":true,"value":"","placeholder":"Storm","options":storms});
+			inputs.add({"type":"text","name":"idea","label":"Idea","hint":"Please enter your idea.","placeholder":"Your Idea.","mandatory":true,"value":ideaContent});
+			form = {"type":"form","title":"Add idea","hint":"Please select your Storm and enter your idea","name":"ID","version":1,"button_label":"Add Idea","actions":{"submit":{"type":"invoke.function","name":"addidea"}},"inputs":inputs};
+			return form;
+		}
+	}
+}
